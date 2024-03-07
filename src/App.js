@@ -1,12 +1,13 @@
-import './App.css';
-import Threed from './Components/Threed';
+import React from 'react';
+import ThreeJSComponent from './Components/Threed';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <Threed />
+    <div>
+      <h1>React 3D Sphere</h1>
+      <ThreeJSComponent />
     </div>
   );
-}
+};
 
 export default App;

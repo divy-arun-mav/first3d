@@ -1,67 +1,54 @@
-import React, { useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+const ThreeJSComponent = () => {
+    const containerRef = useRef();
 
-const Threed = () => {
     useEffect(() => {
+        // Create a scene
         const scene = new THREE.Scene();
 
-        const geometry = new THREE.SphereGeometry(3.64, 64);
-        const material = new THREE.MeshStandardMaterial({
-            color: '#00ff83',
-            roughness: 0.2,
-            metalness: 0.8,
-            emissive: '#004400',
-        });
+        // Create a camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
 
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
-
-        const light = new THREE.PointLight(0xffffff, 1000, 20);
-        light.position.set(0, 10, 10);
-        scene.add(light);
-
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.z = 10;
-        camera.lookAt(0, 0, 0);
-        scene.add(camera);
-
-        const canvas = document.querySelector('.webgl');
-        const renderer = new THREE.WebGLRenderer({ canvas });
+        // Create a renderer
+        const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        containerRef.current.appendChild(renderer.domElement);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
-        controls.screenSpacePanning = false;
-        controls.maxPolarAngle = Math.PI / 2;
-        controls.minPolarAngle = Math.PI / 2;
-        controls.maxAzimuthAngle = Math.PI / 2;
-        controls.minAzimuthAngle = Math.PI / 2;
+        // Create a box geometry
+        const boxGeometry = new THREE.BoxGeometry();
+        const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+        scene.add(boxMesh);
 
+        // Create a point light
+        const pointLight = new THREE.PointLight(0xffffff);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        // Animation loop
         const animate = () => {
             requestAnimationFrame(animate);
 
-            controls.update();
+            // Rotate the box
+            boxMesh.rotation.x += 0.01;
+            boxMesh.rotation.y += 0.01;
 
+            // Render the scene
             renderer.render(scene, camera);
         };
 
         animate();
 
+        // Clean up on component unmount
         return () => {
             renderer.dispose();
-            geometry.dispose();
-            material.dispose();
         };
     }, []);
 
-    return (
-        <div>
-            <canvas className='webgl' width='800' height='600'></canvas>
-        </div>
-    );
+    return <div ref={containerRef} />;
 };
 
-export default Threed;
+export default ThreeJSComponent;
